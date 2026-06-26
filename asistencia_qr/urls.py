@@ -1,0 +1,21 @@
+#Rutas principales del proyecto.
+#asistencia_qr/urls.py
+
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('usuarios/', include('apps.usuarios.urls')),
+    path('asistencia/', include('apps.asistencia.urls')),
+    path('permisos/', include('apps.permisos.urls')),
+    path('reportes/', include('apps.reportes.urls')),
+    path('notificaciones/', include('apps.notificaciones.urls')),
+    path('', include('apps.usuarios.urls')),  # login y dashboard raíz
+]
+
+# Servir archivos multimedia en desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

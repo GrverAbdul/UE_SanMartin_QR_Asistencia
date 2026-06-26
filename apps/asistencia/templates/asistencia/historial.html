@@ -1,0 +1,23 @@
+<!--apps/asistencia/templates/asistencia/historial.html-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Mi Historial de Asistencia</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Fecha/Hora</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in asistencias %}
+        <tr>
+            <td>{{ a.fecha_hora }}</td>
+            <td>{{ a.get_estado_asistencia_display }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">No hay registros.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

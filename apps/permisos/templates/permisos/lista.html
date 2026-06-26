@@ -1,0 +1,26 @@
+<!--apps/permisos/templates/permisos/lista.html-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Permisos</h2>
+<table class="table">
+    <thead>
+        <tr><th>Solicitante</th><th>Fechas</th><th>Estado</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+        {% for p in permisos %}
+        <tr>
+            <td>{{ p.solicitante.get_full_name }}</td>
+            <td>{{ p.fecha_inicio }} - {{ p.fecha_fin }}</td>
+            <td>{{ p.get_estado_permiso_display }}</td>
+            <td>
+                {% if user.rol == 'administrativo' or user.rol == 'directivo' %}
+                    {% if p.estado_permiso == 'pendiente' %}
+                        <a href="{% url 'aprobar_permiso' p.id %}" class="btn btn-sm btn-warning">Revisar</a>
+                    {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

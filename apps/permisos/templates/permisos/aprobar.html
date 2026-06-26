@@ -1,0 +1,15 @@
+<!--apps/permisos/templates/permisos/aprobar.html-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Revisar Permiso</h2>
+<p><strong>Solicitante:</strong> {{ permiso.solicitante.get_full_name }}</p>
+<p><strong>Motivo:</strong> {{ permiso.motivo }}</p>
+{% if permiso.archivo_justificacion %}
+<p><strong>Justificante adjunto:</strong> <a href="{{ permiso.archivo_justificacion.url }}" target="_blank">Ver archivo</a></p>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    <button name="accion" value="aprobar" class="btn btn-success">Aprobar</button>
+    <button name="accion" value="rechazar" class="btn btn-danger">Rechazar</button>
+</form>
+{% endblock %}

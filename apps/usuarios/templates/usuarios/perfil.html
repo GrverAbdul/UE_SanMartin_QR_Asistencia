@@ -1,0 +1,67 @@
+<!--apps/usuarios/templates/usuarios/perfil.html-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Mi Perfil</h2>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="row">
+  <!-- Formulario de datos personales -->
+  <div class="col-md-6">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Apellidos</label>
+        <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" value="{{ user.email|default:'' }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Cédula de Identidad</label>
+        <input type="text" name="ci" class="form-control" value="{{ user.ci|default:'' }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Fecha de Nacimiento</label>
+        <input type="date" name="fecha_nacimiento" class="form-control" value="{{ user.fecha_nacimiento|date:'Y-m-d' }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <input type="text" name="telefono" class="form-control" value="{{ user.telefono|default:'' }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Dirección</label>
+        <textarea name="direccion" class="form-control" rows="2">{{ user.direccion|default:'' }}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </form>
+  </div>
+
+  <!-- Código QR del usuario -->
+  <div class="col-md-6">
+    <h4>Mi Código QR de Asistencia</h4>
+    <p>Este es tu identificador único. Puedes mostrarlo desde tu celular o imprimirlo.</p>
+    <div id="qrcode" class="text-center"></div>
+    <p class="text-muted small">UUID: {{ qr_uuid }}</p>
+  </div>
+</div>
+
+<!-- Librería para generar QR en el navegador -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+  new QRCode(document.getElementById("qrcode"), {
+    text: "{{ qr_uuid }}",
+    width: 200,
+    height: 200,
+  });
+</script>
+{% endblock %}

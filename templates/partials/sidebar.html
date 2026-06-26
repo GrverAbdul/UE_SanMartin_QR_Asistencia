@@ -1,0 +1,40 @@
+<ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'home' %}">Inicio</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'perfil' %}">Mi Perfil</a>
+    </li>
+
+    {% if user.rol == 'administrativo' %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'escaner' %}">Escanear QR</a>
+        </li>
+    {% endif %}
+
+    {% if user.rol == 'docente' %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'registro_manual' %}">Registro Manual</a>
+        </li>
+    {% endif %}
+
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'historial_asistencia' %}">Historial Asistencia</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'solicitar_permiso' %}">Solicitar Permiso</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'lista_permisos' %}">Mis Permisos</a>
+    </li>
+
+    {% if user.rol == 'administrativo' or user.rol == 'directivo' or user.rol == 'docente' %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'generar_reporte' %}">Reportes</a>
+        </li>
+    {% endif %}
+
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'lista_notificaciones' %}">Notificaciones</a>
+    </li>
+</ul>

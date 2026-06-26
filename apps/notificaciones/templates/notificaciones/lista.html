@@ -1,0 +1,13 @@
+<!--apps/notificaciones/templates/notificaciones/lista.html-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Notificaciones</h2>
+<ul class="list-group">
+    {% for n in notificaciones %}
+    <li class="list-group-item {% if not n.leido %}fw-bold{% endif %}">
+        {{ n.titulo }} - <small>{{ n.fecha_envio }}</small>
+        <p>{{ n.mensaje }}</p>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

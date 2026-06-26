@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>Escanear Código QR</h2>
+<div id="reader" style="width: 300px; margin: auto;"></div>
+<div id="resultado" class="mt-3"></div>
+
+<!-- Librería del lector QR -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<!-- Variable con la URL del endpoint (debe definirse antes de usar el script) -->
+<script>
+    const registrarQrUrl = "{% url 'registrar_qr' %}";
+</script>
+
+<!-- Script personalizado que usa la variable anterior -->
+<script src="{% static 'js/escaner.js' %}"></script>
+{% endblock %}

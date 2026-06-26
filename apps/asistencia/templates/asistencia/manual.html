@@ -1,0 +1,65 @@
+<!--apps/asistencia/templates/asistencia/manual.html-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Registro Manual de Asistencia</h2>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-6">
+    <label for="curso" class="form-label">Seleccione Curso</label>
+    <select name="curso" id="curso" class="form-select" onchange="this.form.submit()">
+      <option value="">-- Elija un curso --</option>
+      {% for c in cursos %}
+        <option value="{{ c.id }}" {% if curso_seleccionado and c.id == curso_seleccionado.id %}selected{% endif %}>
+          {{ c.get_nombre_display }} {{ c.get_paralelo_display }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <noscript>
+    <div class="col-md-2 align-self-end">
+      <button type="submit" class="btn btn-primary">Cargar Estudiantes</button>
+    </div>
+  </noscript>
+</form>
+
+{% if curso_seleccionado %}
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="curso" value="{{ curso_seleccionado.id }}">
+    <h4>Estudiantes de {{ curso_seleccionado.get_nombre_display }} {{ curso_seleccionado.get_paralelo_display }}</h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Estudiante</th>
+          <th>CI</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for est in estudiantes %}
+        <tr>
+          <td>{{ est.usuario.get_full_name }}</td>
+          <td>{{ est.usuario.ci|default:'—' }}</td>
+          <td>
+            <select name="estado_{{ est.id }}" class="form-select form-select-sm">
+              <option value="presente">Presente</option>
+              <option value="tarde">Tarde</option>
+              <option value="ausente" selected>Ausente</option>
+            </select>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No hay estudiantes registrados en este curso.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Guardar Asistencia</button>
+  </form>
+{% endif %}
+{% endblock %}

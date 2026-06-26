@@ -1,0 +1,42 @@
+<!--apps/reportes/templates/reportes/resultado.html-->
+
+<!--
+  Plantilla para mostrar el resultado de un reporte en pantalla.
+  se incluye para futuras ampliaciones o si se quiere mostrar antes de exportar.
+-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Resultado del Reporte</h2>
+<p><strong>Curso:</strong> {{ curso }}</p>
+<p><strong>Período:</strong> {{ fecha_inicio }} - {{ fecha_fin }}</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>CI</th>
+            <th>Estudiante</th>
+            <th>Fecha/Hora</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fila in datos %}
+        <tr>
+            <td>{{ fila.0 }}</td>
+            <td>{{ fila.1 }}</td>
+            <td>{{ fila.2 }}</td>
+            <td>{{ fila.3 }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No se encontraron registros.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="mt-3">
+    <a href="{% url 'generar_reporte' %}" class="btn btn-secondary">Volver</a>
+    <!-- Opción para descargar si se implementa una vista previa -->
+    <a href="#" class="btn btn-primary">Descargar PDF</a>
+    <a href="#" class="btn btn-success">Descargar Excel</a>
+</div>
+{% endblock %}

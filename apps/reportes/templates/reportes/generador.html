@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Generar Reporte</h2>
+<form method="post" id="form-reporte">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4">
+            <label>Tipo de reporte</label>
+            <select name="tipo_reporte" id="tipo_reporte" class="form-select" required>
+                <option value="">Seleccione...</option>
+                {% if not es_docente %}
+                    <option value="administrativos">Plantel Administrativo</option>
+                    <option value="docentes">Plantel Docente</option>
+                {% endif %}
+                <option value="curso">Por Curso</option>
+                <option value="estudiante">Estudiante específico</option>
+            </select>
+        </div>
+        <div class="col-md-4" id="grupo_curso" style="display:none;">
+            <label>Curso</label>
+            <select name="curso" id="curso" class="form-select">
+                <option value="">Seleccione curso...</option>
+                {% for c in cursos %}
+                <option value="{{ c.id }}">{{ c.get_nombre_display }} {{ c.get_paralelo_display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4" id="grupo_estudiante" style="display:none;">
+            <label>Estudiante</label>
+            <select name="estudiante" id="estudiante" class="form-select">
+                <option value="">Seleccione estudiante...</option>
+            </select>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-3">
+            <label>Desde</label>
+            <input type="date" name="fecha_inicio" class="form-control" required>
+        </div>
+        <div class="col-md-3">
+            <label>Hasta</label>
+            <input type="date" name="fecha_fin" class="form-control" required>
+        </div>
+        <div class="col-md-2">
+            <label>Formato</label>
+            <select name="formato" class="form-select">
+                <option value="pdf">PDF</option>
+                <option value="excel">Excel</option>
+            </select>
+        </div>
+        <div class="col-md-2 align-self-end">
+            <button type="submit" class="btn btn-primary">Generar</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const tipoReporte = document.getElementById('tipo_reporte');
+    const grupoCurso = document.getElementById('grupo_curso');
+    const grupoEstudiante = document.getElementById('grupo_estudiante');
+    const cursoSelect = document.getElementById('curso');
+    const estudianteSelect = document.getElementById('estudiante');
+
+    // Mostrar/ocultar grupos según tipo
+    tipoReporte.addEventListener('change', function() {
+        const val = this.value;
+        grupoCurso.style.display = (val === 'curso' || val === 'estudiante') ? 'block' : 'none';
+        grupoEstudiante.style.display = (val === 'estudiante') ? 'block' : 'none';
+        if (val !== 'estudiante') {
+            estudianteSelect.innerHTML = '<option value="">Seleccione estudiante...</option>';
+        } else {
+            cargarEstudiantes();
+        }
+    });
+
+    // Al cambiar de curso, recargar estudiantes si el tipo es "estudiante"
+    cursoSelect.addEventListener('change', function() {
+        if (tipoReporte.value === 'estudiante') {
+            cargarEstudiantes();
+        }
+    });
+
+    function cargarEstudiantes() {
+        const cursoId = cursoSelect.value;
+        if (!cursoId) {
+            estudianteSelect.innerHTML = '<option value="">Seleccione un curso primero</option>';
+            return;
+        }
+        fetch(`/reportes/get_estudiantes/?curso_id=${cursoId}`)
+            .then(response => response.json())
+            .then(data => {
+                estudianteSelect.innerHTML = '<option value="">Seleccione estudiante...</option>';
+                data.forEach(est => {
+                    const opt = document.createElement('option');
+                    opt.value = est.id;
+                    opt.textContent = est.nombre;
+                    estudianteSelect.appendChild(opt);
+                });
+                if (data.length === 0) {
+                    estudianteSelect.innerHTML = '<option value="">Sin estudiantes en este curso</option>';
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                estudianteSelect.innerHTML = '<option value="">Error al cargar</option>';
+            });
+    }
+</script>
+{% endblock %}
