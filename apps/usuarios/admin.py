@@ -3,7 +3,7 @@
 from .forms import UsuarioCreationForm, UsuarioChangeForm
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Usuario, Estudiante, Docente, Administrativo, Curso, Materia
+from .models import Usuario, Estudiante, Docente, Administrativo, Curso, Materia, PadreEstudiante
 
 class EstudianteInline(admin.StackedInline):
     model = Estudiante
@@ -20,6 +20,36 @@ class AdministrativoInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Perfil Administrativo'
 
+class PadreEstudianteInline(admin.TabularInline):
+    model = PadreEstudiante
+    fk_name = 'padre'
+    extra = 1
+    verbose_name = "Hijo"
+    verbose_name_plural = "Hijos"
+
+# Modifica UsuarioAdmin para incluir el inline cuando el rol es 'padre'
+# En la clase UsuarioAdmin, añade al método get_inlines:
+    def get_inlines(self, request, obj):
+        if obj:
+            if obj.rol == 'estudiante':
+                return [EstudianteInline]
+            elif obj.rol == 'docente':
+                return [DocenteInline]
+            elif obj.rol == 'administrativo':
+                return [AdministrativoInline]
+            elif obj.rol == 'padre':
+                return [PadreEstudianteInline]
+        return []
+
+@admin.register(PadreEstudiante)
+class PadreEstudianteAdmin(admin.ModelAdmin):
+    list_display = ('padre', 'estudiante', 'curso_del_estudiante')
+    list_filter = ('padre',)
+
+    def curso_del_estudiante(self, obj):
+        return obj.estudiante.curso
+    curso_del_estudiante.short_description = 'Curso'
+    
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
     form = UsuarioChangeForm
@@ -84,3 +114,4 @@ class CursoAdmin(admin.ModelAdmin):
 @admin.register(Materia)
 class MateriaAdmin(admin.ModelAdmin):
     list_display = ('nombre',)
+

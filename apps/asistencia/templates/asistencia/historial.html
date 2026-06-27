@@ -1,22 +1,53 @@
 <!--apps/asistencia/templates/asistencia/historial.html-->
 {% extends 'base.html' %}
 {% block content %}
-<h2>Mi Historial de Asistencia</h2>
-<table class="table">
+<h2>Historial de Asistencia</h2>
+
+{% if user.rol == 'padre' and hijos %}
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="hijo_id" class="form-label">Seleccionar hijo</label>
+                <select name="hijo_id" id="hijo_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Ver todos --</option>
+                    {% for h in hijos %}
+                        <option value="{{ h.id }}" {% if hijo_seleccionado and h.id == hijo_seleccionado.id %}selected{% endif %}>
+                            {{ h.usuario.get_full_name }} - {{ h.curso }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+{% endif %}
+
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Fecha/Hora</th>
             <th>Estado</th>
+            {% if user.rol == 'padre' and not hijo_seleccionado %}
+                <th>Estudiante</th>
+                <th>Curso</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
         {% for a in asistencias %}
         <tr>
             <td>{{ a.fecha_hora }}</td>
-            <td>{{ a.get_estado_asistencia_display }}</td>
+            <td>
+                <span class="badge {% if a.estado_asistencia == 'presente' %}bg-success{% elif a.estado_asistencia == 'tarde' %}bg-warning{% elif a.estado_asistencia == 'ausente' %}bg-danger{% else %}bg-info{% endif %}">
+                    {{ a.get_estado_asistencia_display }}
+                </span>
+            </td>
+            {% if user.rol == 'padre' and not hijo_seleccionado %}
+                <td>{{ a.estudiante.usuario.get_full_name }}</td>
+                <td>{{ a.estudiante.curso }}</td>
+            {% endif %}
         </tr>
         {% empty %}
-        <tr><td colspan="2">No hay registros.</td></tr>
+        <tr><td colspan="4">No hay registros de asistencia.</td></tr>
         {% endfor %}
     </tbody>
 </table>

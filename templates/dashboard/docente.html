@@ -1,5 +1,28 @@
+<!--templates/dashboard/docente.html-->
 {% extends 'base.html' %}
 {% block content %}
-<h2>Panel de Administración</h2>
-<p>Bienvenido, {{ user.get_full_name }}. Aquí puedes revisar cursos y revisar reportes.</p>
+<h2>Panel del Docente</h2>
+<p>Bienvenido, {{ user.get_full_name }}.</p>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header"><i class="bi bi-people"></i> Mi Curso Tutor</div>
+            <div class="card-body">
+                <h5 class="card-title">3ro Sec B</h5>
+                <p class="card-text">Asistencia de hoy: 22/25 presentes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header"><i class="bi bi-clipboard-check"></i> Registro Manual</div>
+            <div class="card-body">
+                <h5 class="card-title">Pasar Lista</h5>
+                <p class="card-text">Use el registro manual para marcar asistencia sin QR.</p>
+                <a href="{% url 'registro_manual' %}" class="btn btn-light btn-sm">Ir al Registro</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -114,3 +114,17 @@ class Curso(models.Model):
 
     def __str__(self):
         return f"{self.get_nombre_display()} - {self.get_paralelo_display()}"
+
+# apps/usuarios/models.py (añadir al final)
+class PadreEstudiante(models.Model):
+    """Relación entre un padre de familia y sus hijos estudiantes."""
+    padre = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='hijos_relacion', limit_choices_to={'rol': 'padre'})
+    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name='padres_relacion')
+
+    class Meta:
+        verbose_name = "Asignación Padre-Estudiante"
+        verbose_name_plural = "Asignaciones Padre-Estudiante"
+        unique_together = ('padre', 'estudiante')
+
+    def __str__(self):
+        return f"{self.padre.get_full_name()} → {self.estudiante.usuario.get_full_name()}"

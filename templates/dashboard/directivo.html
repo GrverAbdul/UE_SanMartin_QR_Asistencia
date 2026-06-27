@@ -1,5 +1,37 @@
+<!--templates/dashboard/directivo.html-->
 {% extends 'base.html' %}
 {% block content %}
-<h2>Panel de Administración</h2>
-<p>Bienvenido, {{ user.get_full_name }}. Aquí puedes gestionar usuarios, cursos y revisar reportes.</p>
+<h2>Panel del Directivo</h2>
+<p>Bienvenido, {{ user.get_full_name }}.</p>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header"><i class="bi bi-building"></i> Institución</div>
+            <div class="card-body">
+                <h5 class="card-title">UE San Martín</h5>
+                <p class="card-text">Asistencia general: 92%</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header"><i class="bi bi-graph-up"></i> Reportes</div>
+            <div class="card-body">
+                <h5 class="card-title">Generar</h5>
+                <p class="card-text">Visualice reportes institucionales.</p>
+                <a href="{% url 'generar_reporte' %}" class="btn btn-light btn-sm">Ir a Reportes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header"><i class="bi bi-person-badge"></i> Personal</div>
+            <div class="card-body">
+                <h5 class="card-title">45</h5>
+                <p class="card-text">Total docentes y administrativos</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

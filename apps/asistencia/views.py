@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from apps.usuarios.models import Usuario, Estudiante, Docente, Administrativo, Curso
+from apps.usuarios.models import Usuario, Estudiante, Docente, Administrativo, Curso, PadreEstudiante
 from apps.usuarios.decorators import role_required
 from .models import Asistencia
 
@@ -179,20 +179,51 @@ def registro_manual(request):
     }
     return render(request, 'asistencia/manual.html', context)
 
+# apps/asistencia/views.py (reemplaza la función historial)
 @login_required
 def historial(request):
     user = request.user
     asistencias = []
-    try:
-        if user.rol == 'estudiante':
+    hijos = None
+    hijo_seleccionado = None
+
+    if user.rol == 'estudiante':
+        try:
             estudiante = Estudiante.objects.get(usuario=user)
             asistencias = Asistencia.objects.filter(estudiante=estudiante).order_by('-fecha_hora')
-        elif user.rol == 'docente':
+        except Estudiante.DoesNotExist:
+            pass
+
+    elif user.rol == 'docente':
+        try:
             docente = Docente.objects.get(usuario=user)
             asistencias = Asistencia.objects.filter(docente=docente).order_by('-fecha_hora')
-        elif user.rol == 'administrativo':
+        except Docente.DoesNotExist:
+            pass
+
+    elif user.rol == 'administrativo':
+        try:
             administrativo = Administrativo.objects.get(usuario=user)
             asistencias = Asistencia.objects.filter(administrativo=administrativo).order_by('-fecha_hora')
-    except (Estudiante.DoesNotExist, Docente.DoesNotExist, Administrativo.DoesNotExist):
-        pass
-    return render(request, 'asistencia/historial.html', {'asistencias': asistencias})
+        except Administrativo.DoesNotExist:
+            pass
+
+    elif user.rol == 'padre':
+        # Obtener los hijos del padre
+        relaciones = PadreEstudiante.objects.filter(padre=user).select_related('estudiante__usuario', 'estudiante__curso')
+        hijos = [rel.estudiante for rel in relaciones]
+
+        # Si se selecciona un hijo específico
+        hijo_id = request.GET.get('hijo_id')
+        if hijo_id and hijos:
+            try:
+                hijo_seleccionado = next(h for h in hijos if str(h.id) == hijo_id)
+                asistencias = Asistencia.objects.filter(estudiante=hijo_seleccionado).order_by('-fecha_hora')
+            except StopIteration:
+                pass
+
+    return render(request, 'asistencia/historial.html', {
+        'asistencias': asistencias,
+        'hijos': hijos,
+        'hijo_seleccionado': hijo_seleccionado,
+    })

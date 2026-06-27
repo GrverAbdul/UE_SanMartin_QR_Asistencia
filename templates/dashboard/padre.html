@@ -1,5 +1,29 @@
+<!--templates/dashboard/padre.html-->
 {% extends 'base.html' %}
 {% block content %}
-<h2>Panel de Del Padre</h2>
-<p>Bienvenido, {{ user.get_full_name }}. Aquí puedes revisar reportes.</p>
+<h2>Panel de Padre de Familia</h2>
+<p>Bienvenido, {{ user.get_full_name }}.</p>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header"><i class="bi bi-people"></i> Mis Hijos</div>
+            <div class="card-body">
+                <h5 class="card-title">2</h5>
+                <p class="card-text">Estudiantes asociados</p>
+                <a href="{% url 'historial_asistencia' %}" class="btn btn-light btn-sm">Ver Asistencia</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header"><i class="bi bi-bell"></i> Notificaciones</div>
+            <div class="card-body">
+                <h5 class="card-title">1</h5>
+                <p class="card-text">Alertas de inasistencia</p>
+                <a href="{% url 'lista_notificaciones' %}" class="btn btn-light btn-sm">Ver Notificaciones</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

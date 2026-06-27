@@ -1,31 +1,35 @@
+<!--apps/reportes/templates/reportes/generador.html-->
 {% extends 'base.html' %}
 {% block content %}
 <h2>Generar Reporte</h2>
-<form method="post" id="form-reporte">
+
+<!-- Formulario de filtros (siempre visible) -->
+<form method="post" id="form-reporte" class="mb-4">
     {% csrf_token %}
+    <input type="hidden" name="descargar" id="input-descargar" value="">
     <div class="row">
         <div class="col-md-4">
             <label>Tipo de reporte</label>
             <select name="tipo_reporte" id="tipo_reporte" class="form-select" required>
                 <option value="">Seleccione...</option>
                 {% if not es_docente %}
-                    <option value="administrativos">Plantel Administrativo</option>
-                    <option value="docentes">Plantel Docente</option>
+                    <option value="administrativos" {% if tipo_reporte == 'administrativos' %}selected{% endif %}>Plantel Administrativo</option>
+                    <option value="docentes" {% if tipo_reporte == 'docentes' %}selected{% endif %}>Plantel Docente</option>
                 {% endif %}
-                <option value="curso">Por Curso</option>
-                <option value="estudiante">Estudiante específico</option>
+                <option value="curso" {% if tipo_reporte == 'curso' %}selected{% endif %}>Por Curso</option>
+                <option value="estudiante" {% if tipo_reporte == 'estudiante' %}selected{% endif %}>Estudiante específico</option>
             </select>
         </div>
-        <div class="col-md-4" id="grupo_curso" style="display:none;">
+        <div class="col-md-4" id="grupo_curso" style="display:{% if tipo_reporte == 'curso' or tipo_reporte == 'estudiante' %}block{% else %}none{% endif %};">
             <label>Curso</label>
             <select name="curso" id="curso" class="form-select">
                 <option value="">Seleccione curso...</option>
                 {% for c in cursos %}
-                <option value="{{ c.id }}">{{ c.get_nombre_display }} {{ c.get_paralelo_display }}</option>
+                <option value="{{ c.id }}" {% if curso_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.get_nombre_display }} {{ c.get_paralelo_display }}</option>
                 {% endfor %}
             </select>
         </div>
-        <div class="col-md-4" id="grupo_estudiante" style="display:none;">
+        <div class="col-md-4" id="grupo_estudiante" style="display:{% if tipo_reporte == 'estudiante' %}block{% else %}none{% endif %};">
             <label>Estudiante</label>
             <select name="estudiante" id="estudiante" class="form-select">
                 <option value="">Seleccione estudiante...</option>
@@ -35,24 +39,54 @@
     <div class="row mt-3">
         <div class="col-md-3">
             <label>Desde</label>
-            <input type="date" name="fecha_inicio" class="form-control" required>
+            <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}" required>
         </div>
         <div class="col-md-3">
             <label>Hasta</label>
-            <input type="date" name="fecha_fin" class="form-control" required>
-        </div>
-        <div class="col-md-2">
-            <label>Formato</label>
-            <select name="formato" class="form-select">
-                <option value="pdf">PDF</option>
-                <option value="excel">Excel</option>
-            </select>
+            <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}" required>
         </div>
         <div class="col-md-2 align-self-end">
-            <button type="submit" class="btn btn-primary">Generar</button>
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Generar Vista Previa</button>
         </div>
     </div>
 </form>
+
+<!-- Vista previa de resultados -->
+{% if vista_previa %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ titulo }}</h5>
+        <div>
+            <button class="btn btn-light btn-sm" onclick="descargar('pdf')"><i class="bi bi-file-earmark-pdf"></i> Descargar PDF</button>
+            <button class="btn btn-light btn-sm" onclick="descargar('excel')"><i class="bi bi-file-earmark-excel"></i> Descargar Excel</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        {% for col in columnas %}
+                            <th>{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in datos %}
+                    <tr>
+                        {% for valor in fila %}
+                            <td>{{ valor }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="{{ columnas|length }}">No se encontraron registros para este período.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -63,7 +97,6 @@
     const cursoSelect = document.getElementById('curso');
     const estudianteSelect = document.getElementById('estudiante');
 
-    // Mostrar/ocultar grupos según tipo
     tipoReporte.addEventListener('change', function() {
         const val = this.value;
         grupoCurso.style.display = (val === 'curso' || val === 'estudiante') ? 'block' : 'none';
@@ -75,7 +108,6 @@
         }
     });
 
-    // Al cambiar de curso, recargar estudiantes si el tipo es "estudiante"
     cursoSelect.addEventListener('change', function() {
         if (tipoReporte.value === 'estudiante') {
             cargarEstudiantes();
@@ -107,5 +139,15 @@
                 estudianteSelect.innerHTML = '<option value="">Error al cargar</option>';
             });
     }
+
+    function descargar(formato) {
+        document.getElementById('input-descargar').value = formato;
+        document.getElementById('form-reporte').submit();
+    }
+
+    // Si ya hay un tipo seleccionado, restaurar estado
+    {% if tipo_reporte == 'estudiante' %}
+        cargarEstudiantes();
+    {% endif %}
 </script>
 {% endblock %}

@@ -28,6 +28,7 @@ def generador_reportes(request):
         fecha_inicio = request.POST.get('fecha_inicio')
         fecha_fin = request.POST.get('fecha_fin')
         formato = request.POST.get('formato', 'pdf')
+        descargar = request.POST.get('descargar', '')
 
         # Validar fechas
         try:
@@ -48,6 +49,7 @@ def generador_reportes(request):
         datos = []
         columnas = []
         titulo = "Reporte"
+        info_extra = {}
 
         if tipo == 'administrativos':
             asistencias = Asistencia.objects.filter(
@@ -79,7 +81,6 @@ def generador_reportes(request):
 
         elif tipo == 'curso':
             curso_id = request.POST.get('curso')
-            # Validar que el curso exista y el usuario tenga permiso (si es docente)
             try:
                 curso = Curso.objects.get(id=curso_id)
                 if request.user.rol == 'docente':
@@ -102,12 +103,12 @@ def generador_reportes(request):
                      for a in asistencias]
             columnas = ['CI', 'Estudiante', 'Fecha/Hora', 'Estado']
             titulo = f"Reporte del Curso {curso.get_nombre_display()} {curso.get_paralelo_display()}"
+            info_extra = {'curso': str(curso)}
 
         elif tipo == 'estudiante':
             estudiante_id = request.POST.get('estudiante')
             try:
                 estudiante = Estudiante.objects.select_related('usuario', 'curso').get(id=estudiante_id)
-                # Verificar permiso si es docente
                 if request.user.rol == 'docente':
                     docente = Docente.objects.get(usuario=request.user)
                     if estudiante.curso.docente_tutor != docente:
@@ -130,12 +131,29 @@ def generador_reportes(request):
             nombre_est = estudiante.usuario.get_full_name()
             titulo = f"Reporte de {nombre_est}"
 
-        if formato == 'pdf':
+        # Si se solicita descarga directa
+        if descargar == 'pdf':
             buffer = generar_pdf(titulo, datos, columnas)
             return FileResponse(buffer, as_attachment=True, filename='reporte.pdf')
-        elif formato == 'excel':
+        elif descargar == 'excel':
             buffer = generar_excel(titulo, datos, columnas)
             return FileResponse(buffer, as_attachment=True, filename='reporte.xlsx')
+
+        # Si no se solicita descarga, mostrar vista previa
+        context = {
+            'cursos': cursos,
+            'es_docente': request.user.rol == 'docente',
+            'vista_previa': True,
+            'datos': datos,
+            'columnas': columnas,
+            'titulo': titulo,
+            'tipo_reporte': tipo,
+            'fecha_inicio': fecha_inicio,
+            'fecha_fin': fecha_fin,
+            'curso_id': request.POST.get('curso', ''),
+            'estudiante_id': request.POST.get('estudiante', ''),
+        }
+        return render(request, 'reportes/generador.html', context)
 
     context = {
         'cursos': cursos,
@@ -151,7 +169,6 @@ def get_estudiantes_curso(request):
     if not curso_id:
         return JsonResponse([], safe=False)
 
-    # Si es docente, verificar que el curso le pertenezca
     if request.user.rol == 'docente':
         try:
             docente = Docente.objects.get(usuario=request.user)

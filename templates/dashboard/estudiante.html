@@ -1,5 +1,27 @@
+<!--templates/dashboard/estudiante.html-->
 {% extends 'base.html' %}
 {% block content %}
-<h2>Panel de Del estudiante</h2>
-<p>Bienvenido, {{ user.get_full_name }}. Aquí puedes revisar reportes.</p>
+<h2>Panel del Estudiante</h2>
+<p>Bienvenido, {{ user.get_full_name }}.</p>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header"><i class="bi bi-calendar-check"></i> Mi Asistencia</div>
+            <div class="card-body">
+                <h5 class="card-title">85%</h5>
+                <p class="card-text">Porcentaje de asistencia general</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header"><i class="bi bi-clock-history"></i> Última Marcación</div>
+            <div class="card-body">
+                <h5 class="card-title">Presente</h5>
+                <p class="card-text">26/06/2026 - 07:45 AM</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
