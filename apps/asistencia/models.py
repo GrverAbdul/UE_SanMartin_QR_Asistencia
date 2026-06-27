@@ -3,6 +3,7 @@ Modelo Asistencia.
 apps/asistencia/models.py
 """
 from django.db import models
+from django.utils import timezone
 from apps.usuarios.models import Usuario, Estudiante, Docente, Administrativo
 
 class Asistencia(models.Model):
@@ -18,7 +19,7 @@ class Asistencia(models.Model):
         ('justificado', 'Justificado'),
     ]
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='asistencias_registradas')
-    fecha_hora = models.DateTimeField(auto_now_add=True)
+    fecha_hora = models.DateTimeField(default=timezone.now)
     tipo_usuario = models.CharField(max_length=20, choices=TIPO_USUARIO)
     estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, null=True, blank=True)
     docente = models.ForeignKey(Docente, on_delete=models.CASCADE, null=True, blank=True)

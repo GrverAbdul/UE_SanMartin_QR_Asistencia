@@ -91,22 +91,11 @@ def aprobar_permiso(request, permiso_id):
             if perfil and tipo:
                 dia_actual = inicio
                 while dia_actual <= fin:
-                    # Crear una marca de tiempo al mediodía de ese día en hora local
-                    mediodia_local = datetime.combine(dia_actual, dtime(12, 0))
-                    mediodia_utc = timezone.make_aware(mediodia_local, timezone.get_current_timezone())
-
-                    # Definir el rango del día completo en hora local (00:00:00 a 23:59:59.999999)
-                    inicio_dia_local = datetime.combine(dia_actual, dtime.min)
-                    fin_dia_local = datetime.combine(dia_actual, dtime.max)
-                    inicio_dia_utc = timezone.make_aware(inicio_dia_local, timezone.get_current_timezone())
-                    fin_dia_utc = timezone.make_aware(fin_dia_local, timezone.get_current_timezone())
-
-                    # Buscar si ya existe un registro de asistencia para ese día y esa persona
+                    # Buscar si ya existe un registro de asistencia para ese día (comparando solo la fecha)
                     asistencia = Asistencia.objects.filter(
                         tipo_usuario=tipo,
                         **{f'{tipo}': perfil},
-                        fecha_hora__gte=inicio_dia_utc,
-                        fecha_hora__lt=fin_dia_utc
+                        fecha_hora__date=dia_actual
                     ).first()
 
                     if asistencia:
@@ -114,10 +103,12 @@ def aprobar_permiso(request, permiso_id):
                         asistencia.estado_asistencia = 'justificado'
                         asistencia.save()
                     else:
-                        # Crear un nuevo registro justificado con la fecha correspondiente
+                        # Crear un nuevo registro justificado al mediodía de ese día (hora local)
+                        mediodia_local = datetime.combine(dia_actual, dtime(12, 0))
+                        mediodia_utc = timezone.make_aware(mediodia_local, timezone.get_current_timezone())
                         Asistencia.objects.create(
                             usuario_registro=request.user,
-                            fecha_hora=mediodia_utc,   # fecha del día del permiso, no actual
+                            fecha_hora=mediodia_utc,
                             tipo_usuario=tipo,
                             estudiante=perfil if tipo == 'estudiante' else None,
                             docente=perfil if tipo == 'docente' else None,
