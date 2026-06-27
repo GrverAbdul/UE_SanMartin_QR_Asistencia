@@ -67,8 +67,11 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default='5432'),
-        'OPTIONS': {'sslmode': 'require'},
+        'PORT': config('DB_PORT', default='6543'),
+        'OPTIONS': {
+            'sslmode': 'require',
+            'application_name': config('SUPABASE_PROJECT_REF', default=''),
+        },
     }
 }
 
