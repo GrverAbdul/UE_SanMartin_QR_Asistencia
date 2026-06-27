@@ -62,7 +62,6 @@ def aprobar_permiso(request, permiso_id):
             permiso.autorizador = request.user
             permiso.save()
 
-            # Actualizar asistencias a 'justificado' en el rango de fechas
             inicio = permiso.fecha_inicio.date()
             fin = permiso.fecha_fin.date()
             usuario = permiso.solicitante
@@ -96,28 +95,29 @@ def aprobar_permiso(request, permiso_id):
                     mediodia_local = datetime.combine(dia_actual, dtime(12, 0))
                     mediodia_utc = timezone.make_aware(mediodia_local, timezone.get_current_timezone())
 
-                    # Buscar si ya hay asistencia en ese día (usamos el rango UTC del día local)
-                    inicio_dia_local = timezone.make_aware(
-                        datetime.combine(dia_actual, dtime.min), timezone.get_current_timezone()
-                    )
-                    fin_dia_local = inicio_dia_local + timedelta(days=1)
+                    # Definir el rango del día completo en hora local (00:00:00 a 23:59:59.999999)
+                    inicio_dia_local = datetime.combine(dia_actual, dtime.min)
+                    fin_dia_local = datetime.combine(dia_actual, dtime.max)
+                    inicio_dia_utc = timezone.make_aware(inicio_dia_local, timezone.get_current_timezone())
+                    fin_dia_utc = timezone.make_aware(fin_dia_local, timezone.get_current_timezone())
 
-                    filtro = {
-                        'tipo_usuario': tipo,
-                        f'{tipo}': perfil,
-                        'fecha_hora__gte': inicio_dia_local,
-                        'fecha_hora__lt': fin_dia_local,
-                    }
-                    asistencia = Asistencia.objects.filter(**filtro).first()
+                    # Buscar si ya existe un registro de asistencia para ese día y esa persona
+                    asistencia = Asistencia.objects.filter(
+                        tipo_usuario=tipo,
+                        **{f'{tipo}': perfil},
+                        fecha_hora__gte=inicio_dia_utc,
+                        fecha_hora__lt=fin_dia_utc
+                    ).first()
+
                     if asistencia:
-                        # Actualizar a justificado
+                        # Actualizar el estado a 'justificado'
                         asistencia.estado_asistencia = 'justificado'
                         asistencia.save()
                     else:
-                        # Crear un registro nuevo justificado
+                        # Crear un nuevo registro justificado con la fecha correspondiente
                         Asistencia.objects.create(
                             usuario_registro=request.user,
-                            fecha_hora=mediodia_utc,   # Fecha del permiso, no actual
+                            fecha_hora=mediodia_utc,   # fecha del día del permiso, no actual
                             tipo_usuario=tipo,
                             estudiante=perfil if tipo == 'estudiante' else None,
                             docente=perfil if tipo == 'docente' else None,
