@@ -10,6 +10,7 @@ from django.utils import timezone
 from apps.usuarios.models import Usuario, Estudiante, Docente, Administrativo, Curso, PadreEstudiante
 from apps.usuarios.decorators import role_required
 from .models import Asistencia
+from django.conf import settings
 
 @login_required
 @role_required('administrativo')           # solo administrativos
@@ -227,3 +228,28 @@ def historial(request):
         'hijos': hijos,
         'hijo_seleccionado': hijo_seleccionado,
     })
+
+@login_required
+@role_required('administrativo', 'directivo')
+def admin_asistencias_hoy(request):
+    hoy = timezone.now().date()
+    asistencias = Asistencia.objects.filter(fecha_hora__date=hoy).select_related(
+        'estudiante__usuario', 'docente__usuario', 'administrativo__usuario'
+    ).order_by('-fecha_hora')
+    return render(request, 'asistencia/admin_hoy.html', {'asistencias': asistencias})
+
+@login_required
+@role_required('administrativo', 'directivo')
+def admin_faltas_criticas(request):
+    inicio_mes = timezone.now().date().replace(day=1)
+    limite = settings.FALTAS_NOTIFICACION
+    estudiantes = []
+    for est in Estudiante.objects.select_related('usuario', 'curso').all():
+        faltas = Asistencia.objects.filter(
+            estudiante=est,
+            fecha_hora__date__gte=inicio_mes,
+            estado_asistencia__in=['ausente', 'tarde']
+        ).count()
+        if faltas > limite:
+            estudiantes.append({'estudiante': est, 'faltas': faltas})
+    return render(request, 'asistencia/faltas_criticas.html', {'estudiantes': estudiantes})

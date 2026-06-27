@@ -1,0 +1,27 @@
+<!--apps/asistencia/templates/asistencia/admin_hoy.html-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Asistencias de Hoy ({{ asistencias.0.fecha_hora|date:"d/m/Y" }})</h2>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Hora</th><th>Persona</th><th>Tipo</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+        {% for a in asistencias %}
+        <tr>
+            <td>{{ a.fecha_hora|time:"H:i" }}</td>
+            <td>
+                {% if a.estudiante %}{{ a.estudiante.usuario.get_full_name }}
+                {% elif a.docente %}{{ a.docente.usuario.get_full_name }}
+                {% elif a.administrativo %}{{ a.administrativo.usuario.get_full_name }}
+                {% endif %}
+            </td>
+            <td>{{ a.get_tipo_usuario_display }}</td>
+            <td><span class="badge {% if a.estado_asistencia == 'presente' %}bg-success{% elif a.estado_asistencia == 'tarde' %}bg-warning{% else %}bg-danger{% endif %}">{{ a.get_estado_asistencia_display }}</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay registros hoy.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

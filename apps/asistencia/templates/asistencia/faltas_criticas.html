@@ -1,0 +1,23 @@
+<!--apps/asistencia/templates/asistencia/faltas_criticas.html-->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Estudiantes con Faltas Críticas</h2>
+<p>Más de {{ FALTAS_NOTIFICACION }} faltas en el mes actual.</p>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Estudiante</th><th>Curso</th><th>Faltas</th><th>Acción</th></tr>
+    </thead>
+    <tbody>
+        {% for item in estudiantes %}
+        <tr>
+            <td>{{ item.estudiante.usuario.get_full_name }}</td>
+            <td>{{ item.estudiante.curso }}</td>
+            <td><span class="badge bg-danger">{{ item.faltas }}</span></td>
+            <td><a href="{% url 'historial_asistencia' %}?hijo_id={{ item.estudiante.id }}" class="btn btn-sm btn-outline-primary">Ver historial</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay estudiantes con faltas críticas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

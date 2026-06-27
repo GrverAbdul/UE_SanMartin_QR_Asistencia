@@ -6,24 +6,26 @@
 
 <div class="row mt-4">
     <div class="col-md-6">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-header"><i class="bi bi-people"></i> Mis Hijos</div>
-            <div class="card-body">
-                <h5 class="card-title">2</h5>
-                <p class="card-text">Estudiantes asociados</p>
-                <a href="{% url 'historial_asistencia' %}" class="btn btn-light btn-sm">Ver Asistencia</a>
+        <a href="{% url 'historial_asistencia' %}" class="text-decoration-none">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header"><i class="bi bi-people"></i> Mis Hijos</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ hijos_count }}</h5>
+                    <p class="card-text">Estudiantes asociados</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-6">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-header"><i class="bi bi-bell"></i> Notificaciones</div>
-            <div class="card-body">
-                <h5 class="card-title">1</h5>
-                <p class="card-text">Alertas de inasistencia</p>
-                <a href="{% url 'lista_notificaciones' %}" class="btn btn-light btn-sm">Ver Notificaciones</a>
+        <a href="{% url 'lista_notificaciones' %}" class="text-decoration-none">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header"><i class="bi bi-bell"></i> Notificaciones</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ notificaciones_no_leidas }}</h5>
+                    <p class="card-text">Alertas sin leer</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 {% endblock %}

@@ -6,31 +6,37 @@
 
 <div class="row mt-4">
     <div class="col-md-4">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-header"><i class="bi bi-person-check"></i> Asistencias Hoy</div>
-            <div class="card-body">
-                <h5 class="card-title">158</h5>
-                <p class="card-text">Marcaciones registradas</p>
+        <a href="{% url 'admin_asistencias_hoy' %}" class="text-decoration-none">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header"><i class="bi bi-person-check"></i> Asistencias Hoy</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ asistencias_hoy }}</h5>
+                    <p class="card-text">Marcaciones registradas</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-4">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-header"><i class="bi bi-hourglass-split"></i> Permisos Pendientes</div>
-            <div class="card-body">
-                <h5 class="card-title">7</h5>
-                <p class="card-text">Solicitudes sin revisar</p>
+        <a href="{% url 'lista_permisos' %}?estado=pendiente" class="text-decoration-none">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header"><i class="bi bi-hourglass-split"></i> Permisos Pendientes</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ permisos_pendientes }}</h5>
+                    <p class="card-text">Solicitudes sin revisar</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-4">
-        <div class="card text-white bg-danger mb-3">
-            <div class="card-header"><i class="bi bi-exclamation-triangle"></i> Faltas Críticas</div>
-            <div class="card-body">
-                <h5 class="card-title">12</h5>
-                <p class="card-text">Estudiantes con más de 3 faltas</p>
+        <a href="{% url 'admin_faltas_criticas' %}" class="text-decoration-none">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header"><i class="bi bi-exclamation-triangle"></i> Faltas Críticas</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ estudiantes_criticos_count }}</h5>
+                    <p class="card-text">Estudiantes con más de {{ FALTAS_NOTIFICACION }} faltas</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 {% endblock %}

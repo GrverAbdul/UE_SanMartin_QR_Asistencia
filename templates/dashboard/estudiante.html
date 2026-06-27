@@ -9,7 +9,7 @@
         <div class="card text-white bg-primary mb-3">
             <div class="card-header"><i class="bi bi-calendar-check"></i> Mi Asistencia</div>
             <div class="card-body">
-                <h5 class="card-title">85%</h5>
+                <h5 class="card-title">{{ porcentaje }}%</h5>
                 <p class="card-text">Porcentaje de asistencia general</p>
             </div>
         </div>
@@ -18,8 +18,8 @@
         <div class="card text-white bg-warning mb-3">
             <div class="card-header"><i class="bi bi-clock-history"></i> Última Marcación</div>
             <div class="card-body">
-                <h5 class="card-title">Presente</h5>
-                <p class="card-text">26/06/2026 - 07:45 AM</p>
+                <h5 class="card-title">{{ ultima.get_estado_asistencia_display|default:"Sin registros" }}</h5>
+                <p class="card-text">{{ ultima.fecha_hora|date:"d/m/Y H:i"|default:"—" }}</p>
             </div>
         </div>
     </div>

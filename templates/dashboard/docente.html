@@ -9,8 +9,8 @@
         <div class="card text-white bg-success mb-3">
             <div class="card-header"><i class="bi bi-people"></i> Mi Curso Tutor</div>
             <div class="card-body">
-                <h5 class="card-title">3ro Sec B</h5>
-                <p class="card-text">Asistencia de hoy: 22/25 presentes</p>
+                <h5 class="card-title">{{ curso_tutor|default:"Sin curso asignado" }}</h5>
+                <p class="card-text">Asistencia de hoy: {{ asistencias_curso }}/{{ total_estudiantes }} presentes</p>
             </div>
         </div>
     </div>
