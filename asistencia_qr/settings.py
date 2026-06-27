@@ -70,7 +70,7 @@ DATABASES = {
         'PORT': config('DB_PORT', default='6543'),
         'OPTIONS': {
             'sslmode': 'require',
-            'application_name': config('SUPABASE_PROJECT_REF', default=''),
+            'options': f"-c reference={config('SUPABASE_PROJECT_REF', default='')}",
         },
     }
 }
