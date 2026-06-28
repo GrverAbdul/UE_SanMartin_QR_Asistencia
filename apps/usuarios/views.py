@@ -67,7 +67,7 @@ def logout_view(request):
 
 @login_required
 def dashboard_admin(request):
-    hoy = timezone.now().date()
+    hoy = timezone.localtime(timezone.now()).date()
     # Asistencias de hoy
     asistencias_hoy = Asistencia.objects.filter(fecha_hora__date=hoy).count()
     # Permisos pendientes
